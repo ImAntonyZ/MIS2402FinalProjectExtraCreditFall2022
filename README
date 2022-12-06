@@ -1,0 +1,17 @@
+The purpose of this project is to understand where in Philadelphia has the most car crash.
+We to break it down by districts!
+
+The API I used was from
+https://www.opendataphilly.org/dataset/fatal-crashes
+https://opendata.arcgis.com/datasets/6510bfe4d500460caef528511d084335_0.csv
+
+How I used them by picking which data I wanted to use and counting how many times it happened.
+
+The first part of the project was to compare districts to death by a bar chart.
+We found out District 15 had the most fatal crashes, while District 17 had the least.
+
+The second part of the project was a trend line.
+I wanted to know if there was a trend of deaths for each year. 
+
+What I found was quite shocking was 2020 had the most death compare to the other years.
+Knowing COVID started in 2020, how did we ended up with more crashes compare to 2021?

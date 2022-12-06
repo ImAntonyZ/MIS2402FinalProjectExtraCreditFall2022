@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <style>
+        .btn {
+            border: 1px solid black;
+            padding: 5px;
+            display: inline-block
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Death by vroom vromm in Philly</h1>
+        <h4>AKA what district has the most fatal car crashes?</h4>
+        <p>
+            What district has the most death by vehicle?
+            <b><br>X-axis = district ; Y-axis = how many deaths</b>
+        </p>
+        <p>Press 'Go' to find out!</p>
+        <form>
+            <input type="button" value="Go" id="btn_1">
+        </form>
+        <br><br><br>
+        <div id="output"></div>
+    </div>
+
+    <div class="container">
+        <h1>Deaths per year</h1>
+        <p>
+            What year had the most death by vehicle?
+            <b><br>Y-axis = how many deaths</b>
+            <b>2019 = 89 Deaths ; 2020 = 155 Deaths ; 2021 = 132 Deaths; 2022 = 108+ Deaths
+
+            </b>
+        </p>
+        <p>Press 'Go' to find out!</p>
+        <form>
+            <input type="button" value="Go" id="btn_2">
+        </form>
+        <br><br><br>
+        <div id="input"></div>
+    </div>
+
+    <script>
+        //functions
+        function getTheCSVData() {
+            console.log("Get CSV data");
+            // let district = 0; // xaxis
+            // let death = 0 ; // yaxis
+            /**
+             * districts
+             * key (x) -> value (y)
+             * district -> how many times it pops up (counter)
+             **/
+            const districts = new Map(); // create map , use this because i have a lot of data. Want to sort by keys
+    
+            $.get("https://opendata.arcgis.com/datasets/6510bfe4d500460caef528511d084335_0.csv", function (result) {
+                console.log(result.split("\n"));
+    
+                result = result.split("\n"); // line break
+                console.log(result);
+    
+                // First row is the row titles, last row is a trailing line break
+                for (let i = 1; i < result.length - 1; i++) { // this is why we put -1
+                    let columns = result[i];
+                    columns = columns.split(",");
+                    console.log(columns);
+    
+                    let districtnum = columns[4]; // district columns
+                    console.log(districtnum);
+    
+                    if (districts.has(districtnum)) { // check bucket exist
+                        districts.set(districtnum, districts.get(districtnum) + 1); // if district exists add 1 , cannot do ++
+                    } else {
+                        districts.set(districtnum, 0); // create bucket
+                    }
+                }
+                console.log(districts); // shows the districts , how many crashes
+                plotTheChart(districts); // call second function because districts only here
+            });
+        }
+    
+        function plotTheChart(districts) {
+    
+            let dkeys = Array.from(districts.keys()); // gives array of keys (x - districts) ['1', '25', '3', ...]  
+            let dvalues = Array.from(districts.values()); // gives array of values (y - deaths) [10, 5, 2, ...]
+            console.log(dkeys.join("|")); // "1,25,3" ...
+            console.log(dvalues.join(",")); // "10|5|2" ...
+    
+            let imageurl = "https://image-charts.com/chart?"
+            imageurl = imageurl + "chco=ff5555|e7a4e4|b2dffb|ffc55c|bbc55c|F97317&"
+            //  imageurl = imageurl + "chd=t:" + districts[0][0] + "," + districts[1][0] + "," + districts[2][0] + "," + districts[3][0] + "," + districts[4][0] + "&"
+            imageurl = imageurl + "chd=t:" + dvalues.join(",") + "&" // line 77 but shorter ^ dvalues.join("|") // this is x
+            // imageurl = imageurl + "chds=0," + districts[0][0] + "&" // i dont know what this is :)
+            imageurl = imageurl + "chs=700x700&"
+            imageurl = imageurl + "cht=bvs&" // this is bar
+            // imageurl = imageurl + "chxl=1:|" + districts[0][1] + "|" + districts[1][1] + "|" + districts[2][1] + "|" + districts[3][1] + "|" + districts[4][1] + "&"
+            imageurl = imageurl + "chxl=1:|" + dkeys.join("|") + "&" // line 82 but shorter ^ // this is y
+            imageurl = imageurl + "chxt=y,x";
+            console.log(imageurl);
+    
+            $("#output").html("<img src='" + imageurl + "'>");
+        }
+
+        const years = new Map();
+
+function getData() {
+    $.get("https://opendata.arcgis.com/datasets/6510bfe4d500460caef528511d084335_0.csv", function (result) { // this is getting data
+        console.log("This is the whole data in a string!")
+        console.log(result);
+
+        //break the whole string into array of rows
+        result = result.split("\n"); // this is line break , rows. Result is now an array. type of result: Array of rows
+        console.log("This is the rows!");
+        console.log(result);
+
+        // break the rows into col (a lot of rows)
+        // first step loop ; break each row ; type of rows : string -> make row into col
+        for (let i = 1; i < result.length - 1; i++) { // i is result.length - 1 ; one row = data. Start 1 to drop "year"
+            // get row, single row
+            // i is the row we are working on
+            let row = result[i]; // the row we are working on
+            row = row.split(","); // , for each data
+            console.log("This is the number of rows: " + i);
+            console.log(row);
+
+            let yearnum = row[3]; // year columns
+            console.log("This is the year column.");
+            console.log(yearnum);
+
+            if (years.has(yearnum)) {
+                years.set(yearnum, years.get(yearnum) + 1);
+            } else {
+                years.set(yearnum, 0);
+            }
+        }
+        console.log(years);
+        plotTheLine(years);
+    })
+}
+
+function plotTheLine(years) {
+    let ykeys = Array.from(years.keys()); // this is years X 
+    let yvalues = Array.from(years.values()); // this is the count Y
+
+    console.log(ykeys.join("|"));
+    console.log(yvalues.join(","));
+
+    //let YearX = ykeys.join(",");
+    let YearY = ykeys.join("|");
+    let YearX = yvalues.join(",");
+
+    console.log(YearX);
+
+    //let imageurl = "https://image-charts.com/chart?"
+    let imageurl = "https://image-charts.com/chart?chco=0077CC&chs=700x700&cht=lc&chma=0,100";
+    //let chd = "chd=t%3A27%2C25%2C60%2C31%2C25%2C39%2C25%2C31%2C26%2C28%2C80%2C28%2C27%2C31%2C27%2C29%2C26%2C35%2C70%2C25&"
+    let chd = "chd=a:" + YearX;
+    let chxt = "chxt=y";
+    let chl = "chl=" + YearY;
+  
+    let combine = imageurl + "&" + chd + "&" + chxt + "&" + chl ; // need "&" to combine URL
+
+    // $("#output").html("<img src='" + imageurl + "'>");
+    $("#input").html("<img src='" + combine + "'>");
+}
+
+
+//buttons
+$('#btn_1').click(function () {
+    getTheCSVData();
+})
+
+$('#btn_2').click(function () {
+    getData();
+})
+    </script>
+</body>
+</html>
